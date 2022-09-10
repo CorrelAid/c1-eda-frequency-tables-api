@@ -8,8 +8,13 @@ class OverallFreqs(BaseModel):
 class NQuestion(BaseModel):
     question_item_id: str
     n: int
-    
-    
-    
+
+class SingleChoice(BaseModel):
+    question_item_id: str
+    value_counts: dict
+
+class MultipleChoice(BaseModel):
+    question_item_id: str
+    value_counts: dict
 
     

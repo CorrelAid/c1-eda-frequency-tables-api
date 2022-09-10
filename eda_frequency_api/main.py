@@ -43,6 +43,15 @@ def root(question_id, db: Session = Depends(get_db)):
     x = query_n_question(db, question_id)
     return x
 
+@app.get("/single_choice/{question_id}",response_model=SingleChoice)
+def root(question_id, db: Session = Depends(get_db)):
+    x = query_single_choice(db, question_id)
+    return x
+
+@app.get("/multiple_choice/{question_id}",response_model=MultipleChoice)
+def root(question_id, db: Session = Depends(get_db)):
+    x = query_multiple_choice(db, question_id)
+    return x
 
 def start():
     """Launched with `poetry run start` at root level"""

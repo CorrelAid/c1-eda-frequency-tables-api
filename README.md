@@ -24,6 +24,10 @@
     poetry run start
     ```
 
+5. Access App under http://0.0.0.0:8000
+
+4. Access API doc under http://0.0.0.0:8000/docs
+
 ## Docker Dev Setup
 
 1. Set up a local container registry
