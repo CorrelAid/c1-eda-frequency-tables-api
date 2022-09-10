@@ -2,21 +2,17 @@
 
 ## Development setup
 
-1. Set up DB
-
-    Follow [this](https://github.com/CorrelAid/kn_fds_statistics_database), but set up the databases on their own.
-
-2. Install poetry
+1. Install poetry
     
     Follow the [official instructions](https://python-poetry.org/docs/)
 
-3. Install requirements
+2. Install requirements
 
     ```
     poetry install
     ```
 
-4. Create .env file
+3. Create .env file
     The database credentials are provided in an evironment variable.  
 
     ```
