@@ -31,7 +31,7 @@ def sql_to_dict_mult(db, query):
     print(keys)
     for row in result:
         print(row)
-        dct[row[keys[0]]] = [row[keys[1]], row[keys[2]]]
+        dct[str(row[keys[0]])+ " "+ str(row[keys[1]])] = row[keys[2]]
     return dct
 
 
