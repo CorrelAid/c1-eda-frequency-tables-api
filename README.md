@@ -1,5 +1,8 @@
 # c1_eda_frequency_tables
 
+## Open questions
+- Does a respondent have to check a question? Are there optional questions?
+
 ## Development setup
 
 1. Install poetry

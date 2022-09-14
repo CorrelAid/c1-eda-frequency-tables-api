@@ -1,12 +1,12 @@
 from pydantic import BaseModel
 from pydantic.schema import Optional
 from datetime import datetime
-from typing import List
+from typing import List, Union
 
 class OverallStats(BaseModel):
     overall_n: int
     
-class ValueCounts(BaseModel):
+class ValueCountsSingle(BaseModel):
     value: int
     value_label: str
     count: int
@@ -14,7 +14,9 @@ class ValueCounts(BaseModel):
 class QuestionStats(BaseModel):
     question_item_id: str
     n: int
-    value_counts: List[ValueCounts]
+    type: str
+    value_counts: Union[List[ValueCountsSingle], dict]
+    
     
 # class SingleChoice(BaseModel):
 #     question_item_id: str
