@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 import eda_frequency_api.models 
-from eda_frequency_api.schemas import *
+from eda_frequency_api.schemas import OverallStats, QuestionStats
 from eda_frequency_api.queries import *
 from eda_frequency_api.database import SessionLocal,engine,metadata
 from eda_frequency_api.helpers import generate_model
@@ -33,25 +33,19 @@ def get_db():
         db.close()
 
     
-@app.get("/",response_model=OverallFreqs)
+@app.get("/",response_model=OverallStats)
 def root(db: Session = Depends(get_db)):
-    x = query_overall_freqs(db)
+    x = query_overall_stats(db)
     return x
 
-@app.get("/n_question/{question_id}",response_model=NQuestion)
+@app.get("/question_stats/{question_id}",response_model=QuestionStats)
 def root(question_id, db: Session = Depends(get_db)):
-    x = query_n_question(db, question_id)
-    return x
+    return query_question_stats(db, question_id)
 
-@app.get("/single_choice/{question_id}",response_model=SingleChoice)
-def root(question_id, db: Session = Depends(get_db)):
-    x = query_single_choice(db, question_id)
-    return x
-
-@app.get("/multiple_choice/{question_id}",response_model=MultipleChoice)
-def root(question_id, db: Session = Depends(get_db)):
-    x = query_multiple_choice(db, question_id)
-    return x
+# @app.get("/multiple_choice/{question_id}",response_model=MultipleChoice)
+# def root(question_id, db: Session = Depends(get_db)):
+#     x = query_multiple_choice(db, question_id)
+#     return x
 
 def start():
     """Launched with `poetry run start` at root level"""
