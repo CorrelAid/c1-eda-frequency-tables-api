@@ -60,5 +60,11 @@ def M_loop_transform(db, question_id):
         for y in x: 
             if y["value"] == 1:  
                 dct[i[0]] = y["count"]
-    print(dct)
+                
+    # if nested subquestions:
+        # for y in x: 
+        #     if y["value"] == 1:  
+        #         dct[y["value_label"]] = y["count"]
+    
+    
     return dct

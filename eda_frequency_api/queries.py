@@ -23,23 +23,20 @@ def query_overall_stats(db):
 def query_question_stats(db, question_id):
 
     # this query only works with single choice questions, because also unchecked multiple choice anwers count as response.
-    query_string_n_question_single = f'''
-    SELECT question_item_id, COUNT(*) FROM q_response_labelled_de_v1 WHERE question_item_ID = '{question_id}' GROUP BY question_item_id
+    query_string_n_question = f'''
+    SELECT count(DISTINCT respondent_id) FROM q_response_labelled_en_v1 WHERE question_item_id = '{question_id}'
     '''
     
-    query_string_value_counts_Y = f'''
+    query_string_value_counts_single_choice= f'''
     SELECT value, value_label, COUNT(value) FROM q_response_labelled_de_v1 WHERE question_item_id = '{question_id}' GROUP BY value, value_label
     '''
     
     typ = sql_to_single(db, f"SELECT type_major FROM question_item_v1 WHERE question_item_id = '{question_id}'", "type_major")
     
     if typ == "Single Choice":
-        return {"question_item_id": question_id, "n": sql_to_single(db, query_string_n_question, "count"), "type": typ, "value_counts": sql_to_lst(db, query_string_value_counts_Y)}
+        return {"question_item_id": question_id, "n": sql_to_single(db, query_string_n_question, "count"), "type": typ, "value_counts": sql_to_lst(db, query_string_value_counts_single_choice)}
     elif typ == "Multiple Choice":
-        value_counts = M_loop_transform(db, question_id)
-        # alternative way to get n of question
-        n = sum(value_counts.values())
-        return {"question_item_id": question_id, "n": n, "type": typ, "value_counts": value_counts}
+        return {"question_item_id": question_id, "n": sql_to_single(db, query_string_n_question, "count"), "type": typ, "value_counts": M_loop_transform(db, question_id)}
 
 
 # def query_single_choice(db, question_id):
