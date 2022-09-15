@@ -7,15 +7,16 @@ class OverallStats(BaseModel):
     overall_n: int
     
 class ValueCountsSingle(BaseModel):
-    value: int
-    value_label: str
+    sub_question_id: Union[str, None] 
+    value: Union[int, None] 
+    value_label: Union[str, None] 
     count: int
     
 class QuestionStats(BaseModel):
     question_item_id: str
     n: int
     type: str
-    value_counts: Union[List[ValueCountsSingle], dict]
+    value_counts: List[ValueCountsSingle]
     
     
 # class SingleChoice(BaseModel):

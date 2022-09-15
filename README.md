@@ -1,17 +1,17 @@
 # c1_eda_frequency_tables
 
-## Open questions
-- Does a respondent have to check a question? Are there optional questions?  Important for determining n.
-    - this is important to know for counting n for multiple choice questions -> only count questions with responses
+## Issues
 - How to get question text?
 - What info (overall and on question lvl) is needed?
 - What is the meaning of the minor question types (type_minor)?
 - for multiple choice questions:
     - is the value always either yes or not chosen? 
     - If the above is the case, is a dict with the subquestions as keys that doesnt display value labels enough?
+- Is it ok to use q_response_labelled_en_v1 instead of q_response_v1?
+    - q_response_labelled_en_v1 doesnt contain NAs, q_response_v1 does
+    - numerical questions are not in q_response_labelled_en_v1
 
-
-Could make sense to use github issues for these questions but too lazy atm, will do that later
+Could make sense to use github issues for this but too lazy atm, will do that later
 
 
 ## Development setup

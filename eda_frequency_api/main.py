@@ -38,7 +38,7 @@ def root(db: Session = Depends(get_db)):
     x = query_overall_stats(db)
     return x
 
-@app.get("/question_stats/{question_id}",response_model=QuestionStats)
+@app.get("/question_stats/{question_id}",response_model=QuestionStats, response_model_exclude_none=True)
 def root(question_id, db: Session = Depends(get_db)):
     return query_question_stats(db, question_id)
 

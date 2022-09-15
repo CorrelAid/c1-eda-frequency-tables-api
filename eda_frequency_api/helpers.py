@@ -14,34 +14,40 @@ def sql_query(db, query):
     """ 
     Executes a SQL query inputted as string on the server
     """
+    
     return db.execute(text(query))
 
 
-def sql_to_lst(db, query):
+def sql_to_single(db, query, column):
     """ 
-    Given a valid sql query result and existing columns, returns a dictionary.
+    Given a valid sql query result resulting in a single result(one row) and a existing column returns the data as the type it was saved in db as.
     """
-    lst = []
+    
     result = sql_query(db, query).all()
-    keys = list(dict(result[0]).keys())
+    
+    return result[0][column]
+
+
+def single_choice_transform(db, query):
+    """ 
+    Given a valid sql query result returns a list.
+    """
+    
+    lst = []
+    
+    result = sql_query(db, query).all()
+    
     for row in result:
         dct = {}
         dct["value"] = int(row["value"])
         dct["value_label"] = row["value_label"]
         dct["count"] = row["count"]
         lst.append(dct)
+    
     return lst
 
 
-def sql_to_single(db, query, column):
-    """ 
-    Given a valid sql query result containing a single result(one row) and a existing column returns a single result as the type it was saved in db as.
-    """
-    result = sql_query(db, query).all()
-    return result[0][column]
-
-
-def M_loop_transform(db, question_id):
+def multiple_choice_transform(db, question_id):
     
     sub_questions = sql_query(db, f"""
     SELECT subquestion_id FROM q_response_labelled_en_v1 WHERE question_item_id IN 
@@ -51,20 +57,39 @@ def M_loop_transform(db, question_id):
     GROUP BY subquestion_id
     """)
     
+    lst = []
     dct  = {}
-    for i in sub_questions:
+    
+    for sub_question in sub_questions:
         query_string_value_counts_M = f'''
-        SELECT value, value_label, COUNT(value) FROM q_response_labelled_de_v1 WHERE subquestion_id = '{i[0]}' GROUP BY value, value_label 
+        SELECT value, value_label, COUNT(value) FROM q_response_labelled_de_v1 WHERE subquestion_id = '{sub_question[0]}' GROUP BY value, value_label
         '''
-        x = sql_to_lst(db, query_string_value_counts_M)
-        for y in x: 
-            if y["value"] == 1:  
-                dct[i[0]] = y["count"]
-                
-    # if nested subquestions:
-        # for y in x: 
-        #     if y["value"] == 1:  
-        #         dct[y["value_label"]] = y["count"]
+        result = single_choice_transform(db, query_string_value_counts_M)
+        
+        for row in result: 
+            if row["value"] == 1:  
+                dct["sub_question_id"] = sub_question[0]
+                dct["count"] = row["count"]
+            
+        # if there is no value that equals 1, dont append empty dict
+        if dct != {}:
+            lst.append(dct)
+        dct  = {}
     
+    return sorted(lst, key=lambda d: d['count']) 
+
+def numeric_transform(db, question_id):
     
-    return dct
+    result = sql_query(db, f"""
+    SELECT COUNT(value) as count, value FROM q_response_v1 WHERE question_item_id = '{question_id}' AND value IS NOT NULL GROUP BY value ORDER BY count
+    """)
+    
+    lst = []
+    
+    for row in result:
+        dct = {}
+        dct["value"] = int(row["value"])
+        dct["count"] = row["count"]
+        lst.append(dct)
+
+    return lst
