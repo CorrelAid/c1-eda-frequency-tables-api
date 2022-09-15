@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 # from eda_frequency_api.models import *
 import json
-from eda_frequency_api.helpers import sql_query, sql_to_single, single_choice_transform, multiple_choice_transform, numeric_transform
+from eda_frequency_api.helpers import sql_query, sql_to_single, single_choice_transform, multiple_choice_transform, numeric_transform, matrix_transform
 # from eda_frequency_api.cache import r
 
 
@@ -35,15 +35,16 @@ def query_question_stats(db, question_id):
     SELECT value, value_label, COUNT(value) FROM q_response_labelled_de_v1 WHERE question_item_id = '{question_id}' GROUP BY value, value_label
     '''
     
-    
+    print(typ)
     
     if typ == "Single Choice":
-        return {"question_item_id": question_id, "n": sql_to_single(db, query_string_n_question, "count"), "type": typ, "value_counts": single_choice_transform(db, query_string_value_counts_single_choice)}
+        return {"question_item_id": question_id, "n": sql_to_single(db, query_string_n_question, "count"), "type": typ, "frequencies": single_choice_transform(db, query_string_value_counts_single_choice)}
     elif typ == "Multiple Choice":
-        return {"question_item_id": question_id, "n": sql_to_single(db, query_string_n_question, "count"), "type": typ, "value_counts": multiple_choice_transform(db, question_id)}
+        return {"question_item_id": question_id, "n": sql_to_single(db, query_string_n_question, "count"), "type": typ, "frequencies": multiple_choice_transform(db, question_id)}
     elif typ == "Numeric":
-        return {"question_item_id": question_id, "n": sql_to_single(db, query_string_n_question, "count"), "type": typ, "value_counts": numeric_transform(db, question_id)}
-
+        return {"question_item_id": question_id, "n": sql_to_single(db, query_string_n_question, "count"), "type": typ, "frequencies": numeric_transform(db, question_id)}
+    elif typ == "Matrix":
+        return {"question_item_id": question_id, "n": sql_to_single(db, query_string_n_question, "count"), "type": typ, "frequencies": matrix_transform(db, question_id)}
 
 # def return_total_stats(db: Session):
 

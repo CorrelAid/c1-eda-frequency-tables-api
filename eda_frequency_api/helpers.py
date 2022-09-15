@@ -28,7 +28,7 @@ def sql_to_single(db, query, column):
     return result[0][column]
 
 
-def single_choice_transform(db, query):
+def single_choice_transform(db, query, value_label: bool = True):
     """ 
     Given a valid sql query result returns a list.
     """
@@ -40,7 +40,8 @@ def single_choice_transform(db, query):
     for row in result:
         dct = {}
         dct["value"] = int(row["value"])
-        dct["value_label"] = row["value_label"]
+        if value_label:
+            dct["value_label"] = row["value_label"]
         dct["count"] = row["count"]
         lst.append(dct)
     
@@ -61,10 +62,10 @@ def multiple_choice_transform(db, question_id):
     dct  = {}
     
     for sub_question in sub_questions:
-        query_string_value_counts_M = f'''
+        query_string_value_counts_multiple_choice = f'''
         SELECT value, value_label, COUNT(value) FROM q_response_labelled_de_v1 WHERE subquestion_id = '{sub_question[0]}' GROUP BY value, value_label
         '''
-        result = single_choice_transform(db, query_string_value_counts_M)
+        result = single_choice_transform(db, query_string_value_counts_multiple_choice)
         
         for row in result: 
             if row["value"] == 1:  
@@ -80,6 +81,7 @@ def multiple_choice_transform(db, question_id):
 
 def numeric_transform(db, question_id):
     
+    # Value is not null is required for this table
     result = sql_query(db, f"""
     SELECT COUNT(value) as count, value FROM q_response_v1 WHERE question_item_id = '{question_id}' AND value IS NOT NULL GROUP BY value ORDER BY count
     """)
@@ -93,3 +95,41 @@ def numeric_transform(db, question_id):
         lst.append(dct)
 
     return lst
+
+def matrix_transform(db, question_id):
+    
+    sub_questions = sql_query(db, f"""
+    SELECT subquestion_id FROM q_response_v1 WHERE question_item_id IN 
+        (
+        SELECT question_item_id from q_response_v1 where question_item_id = '{question_id}'
+        ) 
+    GROUP BY subquestion_id
+    """)
+    
+    lst = []
+    dct  = {}
+    
+    for sub_question in sub_questions:
+        query_string_value_counts_multiple_choice = f'''
+        SELECT value, COUNT(value) FROM q_response_v1 WHERE subquestion_id = '{sub_question[0]}' AND value IS NOT NULL GROUP BY value
+        '''
+        
+        result = single_choice_transform(db, query_string_value_counts_multiple_choice, value_label=False)
+        
+        dct["sub_question_id"] = sub_question[0]
+        lst2 = []
+        
+        for row in result: 
+            dct2 = {}
+            dct2["value"] = row["value"]
+           
+            dct2["count"] = row["count"]
+            
+            lst2.append(dct2)
+        
+        dct["value_counts"] = lst2
+        
+        lst.append(dct)
+        dct  = {}
+    
+    return sorted(lst, key=lambda d: d['sub_question_id']) 
